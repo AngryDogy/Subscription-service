@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./protogen";
+
+message User {
+  int64 id = 1;
+  bool had_trial = 2;
+}
+
+message UserID {
+  int64 id = 1;
+}
+
+service UserService {
+  rpc RegisterUser(UserID) returns (User) {}
+  rpc GetUserByID(UserID) returns (User) {}
+}
+

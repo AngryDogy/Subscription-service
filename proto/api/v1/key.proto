@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package proto;
+
+import "proto/api/v1/user.proto";
+
+option go_package = "./protogen";
+
+message Key {
+  int64 id = 1;
+  bytes data = 2;
+  KeyType key_type = 3;
+  int64 subscription_id = 4;
+}
+
+
+message KeyRequest {
+  int64 user_id = 1;
+  int64 country_id = 2;
+}
+
+enum KeyType {
+  Text = 0;
+  File = 1;
+  Photo = 2;
+}
+
+service KeyService {
+  rpc GetKey(KeyRequest) returns (Key);
+}
