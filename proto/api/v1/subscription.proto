@@ -3,7 +3,6 @@ syntax = "proto3";
 package proto;
 
 import "google/protobuf/timestamp.proto";
-import "proto/api/v1/user.proto";
 
 option go_package = "./protogen";
 
@@ -12,16 +11,28 @@ message Subscription {
   int64 id = 1;
   int64 user_id = 2;
   int64 country_id = 3;
-  google.protobuf.Timestamp expiration_time = 4;
+  bool trial = 4;
+  google.protobuf.Timestamp expiration_datetime = 5;
 }
 
-message SubscriptionRequest {
+message Subscriptions {
+  repeated Subscription subscriptions = 1;
+}
+
+message GetSubscriptionsRequest {
   int64 user_id = 1;
   int64 country_id = 2;
+  bool active = 3;
+}
+
+message CreateSubscriptionRequest {
+  int64 user_id = 1;
+  int64 country_id = 2;
+  bool trial = 3;
+  google.protobuf.Timestamp expiration_datetime = 4;
 }
 
 service SubscriptionService {
-  rpc GetUserSubscriptions(UserID) returns (stream Subscription);
-  rpc ActivateTrialSubscription(SubscriptionRequest) returns(Subscription);
-  rpc ActivatePaidSubscription(SubscriptionRequest) returns(Subscription);
+  rpc GetSubscriptions(GetSubscriptionsRequest) returns (Subscriptions);
+  rpc ActivateSubscription(CreateSubscriptionRequest) returns(Subscription);
 }

@@ -5,23 +5,25 @@ CREATE TABLE IF NOT EXISTS "user"(
 
 CREATE TABLE IF NOT EXISTS country (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE
+    name VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS proxy (
     id SERIAL PRIMARY KEY,
-    address VARCHAR(255) UNIQUE,
-    country_id SERIAL REFERENCES country(id) ON DELETE CASCADE
+    address VARCHAR(255) UNIQUE NOT NULL,
+    country_id INTEGER REFERENCES country(id) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS subscription (
     id SERIAL PRIMARY KEY,
-    user_id SERIAL REFERENCES "user"(id) ON DELETE CASCADE,
-    country_id SERIAL REFERENCES country(id) ON DELETE CASCADE,
-    expiration_date DATE
+    expiration_date TIMESTAMP,
+    user_id BIGINT REFERENCES "user"(id) NOT NULL,
+    country_id INTEGER REFERENCES country(id)
 );
 
-CREATE TYPE keyType as enum (
+DROP TYPE IF EXISTS keyType;
+
+CREATE TYPE keyType AS ENUM (
     'TEXT'
     'FILE'
     'PHOTO'
@@ -29,7 +31,8 @@ CREATE TYPE keyType as enum (
 
 CREATE TABLE IF NOT EXISTS key (
     id SERIAL PRIMARY KEY,
-    data bytea,
     key_type keyType,
-    subscription_id SERIAL REFERENCES subscription(id) ON DELETE CASCADE
+    data bytea,
+    subscription_id INTEGER REFERENCES subscription(id) NOT NULL,
+    proxy_id INTEGER REFERENCES proxy(id) NOT NULL
 );

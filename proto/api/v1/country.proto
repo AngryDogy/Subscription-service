@@ -3,8 +3,6 @@ syntax = "proto3";
 
 package proto;
 
-import "proto/api/v1/user.proto";
-
 option go_package = "./protogen";
 
 
@@ -19,4 +17,5 @@ message CountryName {
 
 service CountryService {
   rpc GetCountryByName(CountryName) returns (Country);
+  rpc CreateCountry(CountryName) returns (Country);
 }

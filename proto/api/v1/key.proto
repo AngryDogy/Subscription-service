@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package proto;
 
-import "proto/api/v1/user.proto";
-
 option go_package = "./protogen";
 
 message Key {
@@ -11,12 +9,12 @@ message Key {
   bytes data = 2;
   KeyType key_type = 3;
   int64 subscription_id = 4;
+  int64 proxy_id = 5;
 }
 
 
 message KeyRequest {
-  int64 user_id = 1;
-  int64 country_id = 2;
+  int64 subscription_id = 1;
 }
 
 enum KeyType {
