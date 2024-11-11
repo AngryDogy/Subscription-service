@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"database/sql"
-	_ "github.com/lib/pq"
+	"context"
+	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
 	"os"
 	"strings"
@@ -10,7 +10,7 @@ import (
 
 type postgresRepository struct {
 	logger *zap.Logger
-	conn   *sql.DB
+	conn   *pgx.Conn
 }
 
 func NewPostgresRepository(logger *zap.Logger) Repository {
@@ -20,12 +20,12 @@ func NewPostgresRepository(logger *zap.Logger) Repository {
 }
 
 func (r *postgresRepository) Connect(source string) error {
-	conn, err := sql.Open("postgres", source)
+	conn, err := pgx.Connect(context.TODO(), source)
 	if err != nil {
 		return err
 	}
 
-	if err := conn.Ping(); err != nil {
+	if err := conn.Ping(context.TODO()); err != nil {
 		return err
 	}
 	r.conn = conn
@@ -41,7 +41,7 @@ func (r *postgresRepository) Initialize(schemePath string) error {
 
 	queries := strings.Split(string(file), ";")
 	for _, query := range queries {
-		_, err := r.conn.Exec(query)
+		_, err := r.conn.Exec(context.TODO(), query)
 		if err != nil {
 			r.logger.Warn("failed to execute query", zap.String("query", query), zap.Error(err))
 		} else {
@@ -53,5 +53,5 @@ func (r *postgresRepository) Initialize(schemePath string) error {
 }
 
 func (r *postgresRepository) Close() error {
-	return r.conn.Close()
+	return r.conn.Close(context.TODO())
 }

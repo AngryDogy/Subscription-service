@@ -17,13 +17,13 @@ type Repository interface {
 }
 
 type UserRepository interface {
-	CreateUser(ctx context.Context, userID int64) (*entity.User, error)
-	FindUserById(ctx context.Context, userID int64) (*entity.User, error)
+	CreateUser(ctx context.Context, userId int64) (*entity.User, error)
+	FindUserById(ctx context.Context, userId int64) (*entity.User, error)
 	UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error)
 }
 
 type KeyRepository interface {
-	FindUserKey(ctx context.Context, userId, countryId int64) (*entity.Key, error)
+	FindUserKeys(ctx context.Context, userId int64) (map[string]*entity.Key, error)
 }
 
 type CountryRepository interface {
@@ -35,7 +35,7 @@ type ProxyRepository interface {
 }
 
 type SubscriptionRepository interface {
-	FindSubscriptionsByUserID(userID int64) ([]*entity.Subscription, error)
-	CreateSubscription(ctx context.Context, userId, countryID int64) (*entity.Subscription, error)
-	CreateTrialSubscription(ctx context.Context, userID, countryID int64) (*entity.Subscription, error)
+	FindSubscriptionsByUserId(userId int64) ([]*entity.Subscription, error)
+	CreateSubscription(ctx context.Context, userId, countryId int64) (*entity.Subscription, error)
+	CreateTrialSubscription(ctx context.Context, userId, countryId int64) (*entity.Subscription, error)
 }

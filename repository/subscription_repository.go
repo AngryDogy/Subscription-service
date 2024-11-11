@@ -6,10 +6,10 @@ import (
 	"errors"
 )
 
-func (r *postgresRepository) FindSubscriptionsByUserID(userID int64) ([]*entity.Subscription, error) {
+func (r *postgresRepository) FindSubscriptionsByUserId(userId int64) ([]*entity.Subscription, error) {
 	query := `SELECT * FROM subscription WHERE user_id = $1`
 
-	rows, err := r.conn.Query(query, userID)
+	rows, err := r.conn.Query(query, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -28,11 +28,11 @@ func (r *postgresRepository) FindSubscriptionsByUserID(userID int64) ([]*entity.
 
 }
 
-func (r *postgresRepository) CreateSubscription(ctx context.Context, userId, countryID int64) (*entity.Subscription, error) {
+func (r *postgresRepository) CreateSubscription(ctx context.Context, userId, countryId int64) (*entity.Subscription, error) {
 	query := `INSERT INTO subscription (user_id, country_id, expiration_date) VALUES ($1, $2, $3) RETURNING id, user_id, country_id, expiration_date`
 
 	var sub entity.Subscription
-	err := r.conn.QueryRowContext(ctx, query, userId, countryID).Scan(&sub.Id, &sub.UserId, &sub.CountryId, &sub.ExpirationTime)
+	err := r.conn.QueryRowContext(ctx, query, userId, countryId).Scan(&sub.Id, &sub.UserId, &sub.CountryId, &sub.ExpirationTime)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +40,8 @@ func (r *postgresRepository) CreateSubscription(ctx context.Context, userId, cou
 	return &sub, nil
 }
 
-func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, userID, countryID int64) (*entity.Subscription, error) {
-	user, err := r.FindUserById(ctx, userID)
+func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, userId, countryId int64) (*entity.Subscription, error) {
+	user, err := r.FindUserById(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, userID
 	query = `INSERT INTO subscription (user_id, country_id, expiration_date)
 				VALUES($1, $2, $3) RETURNING id, user_id, country_id, expiration_date`
 	var sub entity.Subscription
-	err = tx.QueryRowContext(ctx, query, user.HadTrial, user.Id, countryID).Scan(
+	err = tx.QueryRowContext(ctx, query, user.HadTrial, user.Id, countryId).Scan(
 		&sub.Id,
 		&sub.UserId,
 		&sub.CountryId,

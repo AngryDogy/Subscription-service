@@ -3,8 +3,8 @@ package service
 import (
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type ProxyService struct {
@@ -16,7 +16,7 @@ func NewProxyService(repository repository.Repository) *ProxyService {
 	return &ProxyService{proxyRepository: repository}
 }
 
-func (s *ProxyService) GetProxies(empty *empty.Empty, stream grpc.ServerStreamingServer[protogen.Proxy]) error {
+func (s *ProxyService) GetProxies(empty *emptypb.Empty, stream grpc.ServerStreamingServer[protogen.Proxy]) error {
 	proxies, err := s.proxyRepository.GetProxies()
 	if err != nil {
 		return err

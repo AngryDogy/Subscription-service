@@ -6,10 +6,10 @@ import (
 )
 
 func (r *postgresRepository) FindCountryByName(ctx context.Context, name string) (*entity.Country, error) {
-	query := `SELECT * FROM country WHERE name = $1;`
+	query := `SELECT id, name FROM country WHERE name = $1;`
 
 	var country entity.Country
-	err := r.conn.QueryRowContext(ctx, query, name).Scan(&country.Id, &country.Name)
+	err := r.conn.QueryRow(ctx, query, name).Scan(&country.Id, &country.Name)
 	if err != nil {
 		return nil, err
 	}
