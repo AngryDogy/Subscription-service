@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS subscription (
 );
 
 CREATE TYPE keyType AS ENUM (
-    'TEXT'
-    'FILE'
+    'TEXT',
+    'FILE',
     'PHOTO'
 );
 

@@ -1,23 +1,18 @@
 package repository
 
-import "dev/master/entity"
+import (
+	"context"
+	"dev/master/entity"
+	"github.com/jackc/pgx/v5"
+)
 
-func (r *postgresRepository) GetProxies() ([]*entity.Proxy, error) {
-	query := `SELECT * FROM proxy`
+func (r *postgresRepository) GetAllProxies(ctx context.Context) ([]*entity.Proxy, error) {
+	query := `SELECT id, address, country_id FROM proxy`
 
-	rows, err := r.conn.Query(query)
+	rows, err := r.conn.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
-	proxies := make([]*entity.Proxy, 0)
-	for rows.Next() {
-		var p entity.Proxy
-		err := rows.Scan(&p.Id, &p.Address, &p.CountryId)
-		if err != nil {
-			continue
-		}
-		proxies = append(proxies, &p)
-	}
-	return proxies, nil
+	return pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[entity.Proxy])
 }
