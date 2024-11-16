@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
 	"google.golang.org/grpc"
@@ -17,7 +18,7 @@ func NewProxyService(repository repository.Repository) *ProxyService {
 }
 
 func (s *ProxyService) GetProxies(empty *emptypb.Empty, stream grpc.ServerStreamingServer[protogen.Proxy]) error {
-	proxies, err := s.proxyRepository.GetProxies()
+	proxies, err := s.proxyRepository.GetAllProxies(context.Background())
 	if err != nil {
 		return err
 	}

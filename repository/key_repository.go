@@ -40,7 +40,7 @@ func (r *postgresRepository) FindActiveUsersKeys(ctx context.Context, userId int
 	return keys, nil
 }
 
-func (r *postgresRepository) getKeyBySubscription(ctx context.Context, subscriptionId int64) (*entity.Key, error) {
+func (r *postgresRepository) GetKeyBySubscription(ctx context.Context, subscriptionId int64) (*entity.Key, error) {
 	query := `select k.id, k.key_type, k.proxy_id, k.data
 				from key k
 				where k.subscription_id = $1`

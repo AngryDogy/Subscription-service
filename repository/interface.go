@@ -24,11 +24,13 @@ type UserRepository interface {
 
 type KeyRepository interface {
 	FindActiveUsersKeys(ctx context.Context, userId int64) (map[string]*entity.Key, error)
+	GetKeyBySubscription(ctx context.Context, subscriptionId int64) (*entity.Key, error)
 }
 
 type CountryRepository interface {
 	FindCountryByName(ctx context.Context, name string) (*entity.Country, error)
 	GetAllCountries(ctx context.Context) ([]*entity.Country, error)
+	CreateCountry(ctx context.Context, name string) (*entity.Country, error)
 }
 
 type ProxyRepository interface {
