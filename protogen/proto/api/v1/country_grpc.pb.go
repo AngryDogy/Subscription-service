@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,6 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	CountryService_GetAllCountries_FullMethodName  = "/proto.CountryService/GetAllCountries"
 	CountryService_GetCountryByName_FullMethodName = "/proto.CountryService/GetCountryByName"
 	CountryService_CreateCountry_FullMethodName    = "/proto.CountryService/CreateCountry"
 )
@@ -27,6 +29,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CountryServiceClient interface {
+	GetAllCountries(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Countries, error)
 	GetCountryByName(ctx context.Context, in *CountryName, opts ...grpc.CallOption) (*Country, error)
 	CreateCountry(ctx context.Context, in *CountryName, opts ...grpc.CallOption) (*Country, error)
 }
@@ -37,6 +40,16 @@ type countryServiceClient struct {
 
 func NewCountryServiceClient(cc grpc.ClientConnInterface) CountryServiceClient {
 	return &countryServiceClient{cc}
+}
+
+func (c *countryServiceClient) GetAllCountries(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Countries, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Countries)
+	err := c.cc.Invoke(ctx, CountryService_GetAllCountries_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *countryServiceClient) GetCountryByName(ctx context.Context, in *CountryName, opts ...grpc.CallOption) (*Country, error) {
@@ -63,6 +76,7 @@ func (c *countryServiceClient) CreateCountry(ctx context.Context, in *CountryNam
 // All implementations must embed UnimplementedCountryServiceServer
 // for forward compatibility.
 type CountryServiceServer interface {
+	GetAllCountries(context.Context, *emptypb.Empty) (*Countries, error)
 	GetCountryByName(context.Context, *CountryName) (*Country, error)
 	CreateCountry(context.Context, *CountryName) (*Country, error)
 	mustEmbedUnimplementedCountryServiceServer()
@@ -75,6 +89,9 @@ type CountryServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCountryServiceServer struct{}
 
+func (UnimplementedCountryServiceServer) GetAllCountries(context.Context, *emptypb.Empty) (*Countries, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllCountries not implemented")
+}
 func (UnimplementedCountryServiceServer) GetCountryByName(context.Context, *CountryName) (*Country, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCountryByName not implemented")
 }
@@ -100,6 +117,24 @@ func RegisterCountryServiceServer(s grpc.ServiceRegistrar, srv CountryServiceSer
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CountryService_ServiceDesc, srv)
+}
+
+func _CountryService_GetAllCountries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CountryServiceServer).GetAllCountries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CountryService_GetAllCountries_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CountryServiceServer).GetAllCountries(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CountryService_GetCountryByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -145,6 +180,10 @@ var CountryService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.CountryService",
 	HandlerType: (*CountryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetAllCountries",
+			Handler:    _CountryService_GetAllCountries_Handler,
+		},
 		{
 			MethodName: "GetCountryByName",
 			Handler:    _CountryService_GetCountryByName_Handler,

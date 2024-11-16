@@ -27,8 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	RegisterUser(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*User, error)
-	GetUserByID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*User, error)
+	RegisterUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
+	GetUserByID(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
 }
 
 type userServiceClient struct {
@@ -39,7 +39,7 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) RegisterUser(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) RegisterUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(User)
 	err := c.cc.Invoke(ctx, UserService_RegisterUser_FullMethodName, in, out, cOpts...)
@@ -49,7 +49,7 @@ func (c *userServiceClient) RegisterUser(ctx context.Context, in *UserID, opts .
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserByID(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*User, error) {
+func (c *userServiceClient) GetUserByID(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(User)
 	err := c.cc.Invoke(ctx, UserService_GetUserByID_FullMethodName, in, out, cOpts...)
@@ -63,8 +63,8 @@ func (c *userServiceClient) GetUserByID(ctx context.Context, in *UserID, opts ..
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
-	RegisterUser(context.Context, *UserID) (*User, error)
-	GetUserByID(context.Context, *UserID) (*User, error)
+	RegisterUser(context.Context, *UserId) (*User, error)
+	GetUserByID(context.Context, *UserId) (*User, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -75,10 +75,10 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) RegisterUser(context.Context, *UserID) (*User, error) {
+func (UnimplementedUserServiceServer) RegisterUser(context.Context, *UserId) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserByID(context.Context, *UserID) (*User, error) {
+func (UnimplementedUserServiceServer) GetUserByID(context.Context, *UserId) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
@@ -103,7 +103,7 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 }
 
 func _UserService_RegisterUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
+	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -115,13 +115,13 @@ func _UserService_RegisterUser_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: UserService_RegisterUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).RegisterUser(ctx, req.(*UserID))
+		return srv.(UserServiceServer).RegisterUser(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
+	in := new(UserId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func _UserService_GetUserByID_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: UserService_GetUserByID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserByID(ctx, req.(*UserID))
+		return srv.(UserServiceServer).GetUserByID(ctx, req.(*UserId))
 	}
 	return interceptor(ctx, in, info, handler)
 }

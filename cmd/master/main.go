@@ -5,6 +5,7 @@ import (
 	"dev/master/repository"
 	"dev/master/server"
 	"dev/master/service"
+	"fmt"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -41,7 +42,7 @@ func main() {
 		SetService(&protogen.ProxyService_ServiceDesc, service.NewProxyService(postgresRepository)).
 		SetService(&protogen.SubscriptionService_ServiceDesc, service.NewSubscriptionService(postgresRepository))
 
-	lis, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", os.Getenv("GRPC_PORT")))
 	if err != nil {
 		logger.Fatal("Failed to create listener", zap.Error(err))
 	}

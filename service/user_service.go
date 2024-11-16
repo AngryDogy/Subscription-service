@@ -17,8 +17,8 @@ func NewUserService(repository repository.Repository) *UserService {
 	}
 }
 
-func (s *UserService) RegisterUser(ctx context.Context, userID *protogen.UserID) (*protogen.User, error) {
-	user, err := s.userRepository.CreateUser(ctx, userID.GetId())
+func (s *UserService) RegisterUser(ctx context.Context, userId *protogen.UserId) (*protogen.User, error) {
+	user, err := s.userRepository.CreateUser(ctx, userId.GetId())
 	if err != nil {
 		return nil, err
 	}
@@ -29,8 +29,8 @@ func (s *UserService) RegisterUser(ctx context.Context, userID *protogen.UserID)
 	}, nil
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, userID *protogen.UserID) (*protogen.User, error) {
-	user, err := s.userRepository.FindUserById(ctx, userID.GetId())
+func (s *UserService) GetUserByID(ctx context.Context, userId *protogen.UserId) (*protogen.User, error) {
+	user, err := s.userRepository.FindUserById(ctx, userId.GetId())
 	if err != nil {
 		return nil, err
 	}

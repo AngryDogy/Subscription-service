@@ -4,44 +4,47 @@ import (
 	"context"
 	"dev/master/entity"
 	"errors"
+	"fmt"
+	"github.com/jackc/pgx/v5"
+	"time"
 )
 
-func (r *postgresRepository) FindSubscriptionsByUserID(userID int64) ([]*entity.Subscription, error) {
-	query := `SELECT * FROM subscription WHERE user_id = $1`
+func (r *postgresRepository) FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error) {
+	query := `SELECT id, expiration_date, user_id, country_id FROM subscription WHERE user_id = $1`
 
-	rows, err := r.conn.Query(query, userID)
+	if countryId != -1 {
+		query += fmt.Sprintf(` AND country_id = %d`, countryId)
+	}
+
+	if active {
+		query += ` AND expiration_date > now()`
+	}
+
+	rows, err := r.conn.Query(ctx, query, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	subs := make([]*entity.Subscription, 0)
-	for rows.Next() {
-		var sub entity.Subscription
-		err := rows.Scan(&sub.Id, &sub.UserId, &sub.CountryId, &sub.ExpirationTime)
-		if err != nil {
-			continue
-		}
-
-		subs = append(subs, &sub)
-	}
-	return subs, nil
+	return pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[entity.Subscription])
 
 }
 
-func (r *postgresRepository) CreateSubscription(ctx context.Context, userId, countryID int64) (*entity.Subscription, error) {
+func (r *postgresRepository) CreateSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error) {
 	query := `INSERT INTO subscription (user_id, country_id, expiration_date) VALUES ($1, $2, $3) RETURNING id, user_id, country_id, expiration_date`
 
-	var sub entity.Subscription
-	err := r.conn.QueryRowContext(ctx, query, userId, countryID).Scan(&sub.Id, &sub.UserId, &sub.CountryId, &sub.ExpirationTime)
+	err := r.conn.
+		QueryRow(ctx, query, subscription.UserId, subscription.CountryId, subscription.ExpirationDateTime.Truncate(time.Second)).
+		Scan(&subscription.Id, &subscription.UserId, &subscription.CountryId, &subscription.ExpirationDateTime)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return &sub, nil
+	return &subscription, nil
 }
 
-func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, userID, countryID int64) (*entity.Subscription, error) {
-	user, err := r.FindUserById(ctx, userID)
+func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error) {
+	user, err := r.FindUserById(ctx, subscription.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -50,29 +53,23 @@ func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, userID
 		return nil, errors.New("user already had trial")
 	}
 
-	tx, err := r.conn.Begin()
+	tx, err := r.conn.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Rollback()
+	defer tx.Rollback(ctx)
 
 	query := `UPDATE "user" SET had_trial=$1 WHERE id=$2`
-	_, err = tx.ExecContext(ctx, query, user.HadTrial, user.Id)
+	_, err = tx.Exec(ctx, query, true, user.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	query = `INSERT INTO subscription (user_id, country_id, expiration_date)
-				VALUES($1, $2, $3) RETURNING id, user_id, country_id, expiration_date`
-	var sub entity.Subscription
-	err = tx.QueryRowContext(ctx, query, user.HadTrial, user.Id, countryID).Scan(
-		&sub.Id,
-		&sub.UserId,
-		&sub.CountryId,
-		&sub.ExpirationTime)
+	sub, err := r.CreateSubscription(ctx, subscription)
 
 	if err != nil {
 		return nil, err
 	}
-	return &sub, tx.Commit()
+
+	return sub, tx.Commit(ctx)
 }
