@@ -12,8 +12,6 @@ message Proxy {
   int64 country_id = 3;
 }
 
-message ProxiesRequest {}
-
 service ProxyService {
   rpc GetProxies(google.protobuf.Empty) returns (stream Proxy);
 }
