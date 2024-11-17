@@ -6,6 +6,7 @@ import (
 	"dev/master/server"
 	"dev/master/service"
 	"dev/master/service/proxy"
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"net"
@@ -16,22 +17,22 @@ func main() {
 	logger := zap.Must(zap.NewDevelopment())
 	defer logger.Sync()
 
-	//err := godotenv.Load()
-	//if err != nil {
-	//	logger.Fatal("Error loading .env file", zap.Error(err))
-	//}
+	err := godotenv.Load()
+	if err != nil {
+		logger.Fatal("Error loading .env file", zap.Error(err))
+	}
 
 	postgresRepository := repository.NewPostgresRepository(logger)
-	err := postgresRepository.Connect(os.Getenv("DATABASE_URL"))
+	err = postgresRepository.Connect(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		logger.Fatal("Error connecting to postgres database", zap.Error(err))
 	}
 	defer postgresRepository.Close()
 
-	//err = postgresRepository.Initialize(os.Getenv("SCHEME_PATH"))
-	//if err != nil {
-	//	logger.Fatal("Error initializing postgres database", zap.Error(err))
-	//}
+	err = postgresRepository.Initialize(os.Getenv("SCHEME_PATH"))
+	if err != nil {
+		logger.Fatal("Error initializing postgres database", zap.Error(err))
+	}
 
 	grpcServer := server.NewServer(logger, make([]grpc.ServerOption, 0))
 	grpcServer.
