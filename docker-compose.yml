@@ -3,7 +3,7 @@ services:
       image: angrydogy/sub-backend
       environment:
         - SCHEME_PATH=scheme.sql
-        - DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
+        - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
         - GRPC_PORT=localhost:8080
       depends_on:
         - postgres
