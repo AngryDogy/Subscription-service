@@ -23,8 +23,8 @@ func NewClient() Client {
 type clientImpl struct{}
 
 type jsonKey struct {
-	Id      int64  `json:"id"`
-	Data    []byte `json:"key"`
+	Id      string `json:"id"`
+	Data    string `json:"key"`
 	KeyType string `json:"key_type"`
 }
 
@@ -50,7 +50,7 @@ func (c *clientImpl) CreateKey(address string) (*entity.Key, error) {
 
 	return &entity.Key{
 		IdInProxy: key.Id,
-		Data:      key.Data,
+		Data:      []byte(key.Data),
 		KeyType:   entity.KeyTypeFromString(key.KeyType),
 	}, nil
 }
