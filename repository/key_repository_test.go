@@ -54,3 +54,29 @@ func Test_postgresRepository_getKeyBySubscription(t *testing.T) {
 		*key,
 	)
 }
+
+func Test_addKey(t *testing.T) {
+	repository := &postgresRepository{logger: nil}
+	err := repository.Connect(os.Getenv("DATABASE_URL"))
+
+	require.Nil(t, err)
+	defer repository.Close()
+
+	key, err := repository.InsertKey(context.TODO(), entity.Key{
+		Data:           []byte("ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTptMElrR3FCOGREalZqRFFNZjdENVdY@158.160.6.79:1416/?outline=1"),
+		KeyType:        entity.Text,
+		SubscriptionId: 1,
+		ProxyId:        1,
+		IdInProxy:      "1",
+	})
+
+	require.Nil(t, err)
+	require.Equal(t, entity.Key{
+		Id:             2,
+		Data:           []byte("ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTptMElrR3FCOGREalZqRFFNZjdENVdY@158.160.6.79:1416/?outline=1"),
+		KeyType:        entity.Text,
+		SubscriptionId: 1,
+		ProxyId:        1,
+		IdInProxy:      "1",
+	}, *key)
+}

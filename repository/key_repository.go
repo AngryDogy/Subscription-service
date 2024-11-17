@@ -4,6 +4,7 @@ import (
 	"context"
 	"dev/master/entity"
 	"github.com/jackc/pgx/v5"
+	"go.uber.org/zap"
 )
 
 func (r *postgresRepository) FindActiveUsersKeys(ctx context.Context, userId int64) (map[string]*entity.Key, error) {
@@ -60,6 +61,8 @@ func (r *postgresRepository) GetKeyBySubscription(ctx context.Context, subscript
 
 func (r *postgresRepository) InsertKey(ctx context.Context, key entity.Key) (*entity.Key, error) {
 	query := `INSERT INTO key (data, key_type, subscription_id, proxy_id, id_in_proxy) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+
+	r.logger.Info("Key data: %s", zap.String("data", string(key.Data)))
 
 	err := r.conn.QueryRow(ctx, query, key.Data, key.KeyType.String(), key.SubscriptionId, key.ProxyId, key.IdInProxy).Scan(&key.Id)
 
