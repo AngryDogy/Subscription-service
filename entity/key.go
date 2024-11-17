@@ -6,6 +6,7 @@ type Key struct {
 	KeyType        KeyType `db:"-"`
 	SubscriptionId int64   `db:"subscription_id"`
 	ProxyId        int64   `db:"proxy_id"`
+	IdInProxy      int64   `db:"id_in_proxy"`
 }
 
 type KeyType int
@@ -27,4 +28,8 @@ func KeyTypeFromString(keyType string) KeyType {
 	default:
 		return Text
 	}
+}
+
+func (k KeyType) String() string {
+	return [...]string{"TEXT", "FILE", "PHOTO"}[k]
 }

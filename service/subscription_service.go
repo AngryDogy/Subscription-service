@@ -5,17 +5,25 @@ import (
 	"dev/master/entity"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
+	"dev/master/service/proxy"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"os"
 )
+
+const DEFAULT_PROXY_ID = int64(1)
 
 type SubscriptionService struct {
 	subscriptionRepository repository.SubscriptionRepository
+	keyRepository          repository.KeyRepository
+	proxyClient            proxy.Client
 	protogen.UnimplementedSubscriptionServiceServer
 }
 
-func NewSubscriptionService(repository repository.Repository) *SubscriptionService {
+func NewSubscriptionService(repository repository.Repository, proxyClient proxy.Client) *SubscriptionService {
 	return &SubscriptionService{
 		subscriptionRepository: repository,
+		keyRepository:          repository,
+		proxyClient:            proxyClient,
 	}
 }
 
@@ -38,11 +46,34 @@ func (s *SubscriptionService) GetSubscriptions(ctx context.Context, request *pro
 }
 
 func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request *protogen.CreateSubscriptionRequest) (*protogen.Subscription, error) {
-	subscription, err := s.subscriptionRepository.CreateSubscription(ctx, entity.Subscription{
-		UserId:             request.UserId,
-		CountryId:          request.CountryId,
-		ExpirationDateTime: request.ExpirationDatetime.AsTime(),
-	})
+	var subscription *entity.Subscription
+	var err error
+	if request.Trial {
+		subscription, err = s.subscriptionRepository.CreateTrialSubscription(ctx, entity.Subscription{
+			UserId:             request.UserId,
+			CountryId:          request.CountryId,
+			ExpirationDateTime: request.ExpirationDatetime.AsTime(),
+		})
+	} else {
+		subscription, err = s.subscriptionRepository.CreateSubscription(ctx, entity.Subscription{
+			UserId:             request.UserId,
+			CountryId:          request.CountryId,
+			ExpirationDateTime: request.ExpirationDatetime.AsTime(),
+		})
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := s.proxyClient.CreateKey(os.Getenv("DEFAULT_PROXY_ADDRESS"))
+	if err != nil {
+		return nil, err
+	}
+	key.SubscriptionId = subscription.Id
+	key.ProxyId = DEFAULT_PROXY_ID
+
+	_, err = s.keyRepository.InsertKey(ctx, *key)
 	if err != nil {
 		return nil, err
 	}

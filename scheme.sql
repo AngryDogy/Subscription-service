@@ -32,11 +32,6 @@ CREATE TABLE IF NOT EXISTS key (
     key_type keyType,
     data bytea,
     subscription_id INTEGER REFERENCES subscription(id),
-    proxy_id INTEGER REFERENCES proxy(id) NOT NULL
+    proxy_id INTEGER REFERENCES proxy(id) NOT NULL,
+    id_in_proxy VARCHAR(255) NOT NULL
 );
-
-select c.name, k.id, k.key_type, s.id, k.proxy_id, k.data
-from key k join subscription s
-on k.subscription_id = s.id join country c
-on s.country_id = c.id
-where s.user_id = 1 and s.expiration_date > now();
