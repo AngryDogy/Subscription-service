@@ -40,7 +40,7 @@ func main() {
 		SetService(&protogen.KeyService_ServiceDesc, service.NewKeyService(postgresRepository)).
 		SetService(&protogen.CountryService_ServiceDesc, service.NewCountryService(postgresRepository)).
 		SetService(&protogen.ProxyService_ServiceDesc, service.NewProxyService(postgresRepository)).
-		SetService(&protogen.SubscriptionService_ServiceDesc, service.NewSubscriptionService(postgresRepository, proxy.NewClient()))
+		SetService(&protogen.SubscriptionService_ServiceDesc, service.NewSubscriptionService(postgresRepository, proxy.NewClient(logger)))
 
 	lis, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
 	if err != nil {

@@ -3,6 +3,7 @@ package proxy
 import (
 	"dev/master/entity"
 	"encoding/json"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
@@ -16,11 +17,13 @@ type Client interface {
 	CreateKey(address string) (*entity.Key, error)
 }
 
-func NewClient() Client {
-	return &clientImpl{}
+func NewClient(logger *zap.Logger) Client {
+	return &clientImpl{logger: logger}
 }
 
-type clientImpl struct{}
+type clientImpl struct {
+	logger *zap.Logger
+}
 
 type jsonKey struct {
 	Id      string `json:"id"`
@@ -46,6 +49,10 @@ func (c *clientImpl) CreateKey(address string) (*entity.Key, error) {
 
 	var key jsonKey
 	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	c.logger.Info("Received key", zap.String("key", string(data)))
 	err = json.Unmarshal(data, &key)
 
 	return &entity.Key{
