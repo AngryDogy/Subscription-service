@@ -59,9 +59,9 @@ func (r *postgresRepository) GetKeyBySubscription(ctx context.Context, subscript
 }
 
 func (r *postgresRepository) InsertKey(ctx context.Context, key entity.Key) (*entity.Key, error) {
-	query := `INSERT INTO key (data, key_type, subscription_id, proxy_id, id_in_proxy) VALUES ($1, $2, $3, $4) RETURNING id`
+	query := `INSERT INTO key (data, key_type, subscription_id, proxy_id, id_in_proxy) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
-	err := r.conn.QueryRow(ctx, query, key.Data, key.KeyType.String(), key.SubscriptionId, key.ProxyId).Scan(&key.Id)
+	err := r.conn.QueryRow(ctx, query, key.Data, key.KeyType.String(), key.SubscriptionId, key.ProxyId, key.IdInProxy).Scan(&key.Id)
 
 	if err != nil {
 		return nil, err
