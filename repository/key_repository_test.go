@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"dev/master/entity"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_postgresRepository_FindActiveUsersKeys(t *testing.T) {
@@ -38,7 +39,7 @@ func Test_postgresRepository_getKeyBySubscription(t *testing.T) {
 	require.Nil(t, err)
 	defer repository.Close()
 
-	key, err := repository.getKeyBySubscription(context.TODO(), 1)
+	key, err := repository.GetKeyBySubscription(context.TODO(), 1)
 
 	require.Nil(t, err)
 	require.NotNil(t, key)
