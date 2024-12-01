@@ -5,9 +5,16 @@ import (
 	"dev/master/entity"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 )
+
+type SubscriptionRepository interface {
+	FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error)
+	CreateSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error)
+	CreateTrialSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error)
+}
 
 func (r *postgresRepository) FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error) {
 	query := `SELECT id, expiration_date, user_id, country_id FROM subscription WHERE user_id = $1`

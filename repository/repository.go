@@ -2,11 +2,23 @@ package repository
 
 import (
 	"context"
-	"github.com/jackc/pgx/v5"
-	"go.uber.org/zap"
 	"os"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
+	"go.uber.org/zap"
 )
+
+type Repository interface {
+	Connect(source string) error
+	Close() error
+	Initialize(schemePath string) error
+	UserRepository
+	KeyRepository
+	CountryRepository
+	ProxyRepository
+	SubscriptionRepository
+}
 
 type postgresRepository struct {
 	logger *zap.Logger

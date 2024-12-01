@@ -3,8 +3,15 @@ package repository
 import (
 	"context"
 	"dev/master/entity"
+
 	"github.com/jackc/pgx/v5"
 )
+
+type CountryRepository interface {
+	FindCountryByName(ctx context.Context, name string) (*entity.Country, error)
+	GetAllCountries(ctx context.Context) ([]*entity.Country, error)
+	CreateCountry(ctx context.Context, name string) (*entity.Country, error)
+}
 
 func (r *postgresRepository) FindCountryByName(ctx context.Context, name string) (*entity.Country, error) {
 	query := `SELECT id, name FROM country WHERE name = $1;`

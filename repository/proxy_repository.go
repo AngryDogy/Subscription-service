@@ -3,8 +3,13 @@ package repository
 import (
 	"context"
 	"dev/master/entity"
+
 	"github.com/jackc/pgx/v5"
 )
+
+type ProxyRepository interface {
+	GetAllProxies(ctx context.Context) ([]*entity.Proxy, error)
+}
 
 func (r *postgresRepository) GetAllProxies(ctx context.Context) ([]*entity.Proxy, error) {
 	query := `SELECT id, address, country_id FROM proxy`

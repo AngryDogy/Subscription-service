@@ -5,6 +5,12 @@ import (
 	"dev/master/entity"
 )
 
+type UserRepository interface {
+	CreateUser(ctx context.Context, userId int64) (*entity.User, error)
+	FindUserById(ctx context.Context, userId int64) (*entity.User, error)
+	UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error)
+}
+
 func (r *postgresRepository) CreateUser(ctx context.Context, userId int64) (*entity.User, error) {
 	query := `INSERT INTO "user"(id, had_trial) VALUES($1, $2) RETURNING id, had_trial`
 

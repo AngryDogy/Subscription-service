@@ -2,9 +2,10 @@ package server
 
 import (
 	"context"
+	"net"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"net"
 )
 
 type Server struct {
@@ -29,9 +30,9 @@ func (s *Server) SetService(serviceDesc *grpc.ServiceDesc, service interface{}) 
 	return s
 }
 
-func (s *Server) Serve(lis net.Listener) {
+func (s *Server) Serve(lis net.Listener) error {
 	s.logger.Info("server started", zap.String("address", lis.Addr().String()))
-	s.grpcServer.Serve(lis)
+	return s.grpcServer.Serve(lis)
 }
 
 func (s *Server) Stop() {
