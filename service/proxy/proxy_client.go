@@ -15,6 +15,7 @@ const (
 
 type Client interface {
 	CreateKey(address string) (*entity.Key, error)
+	DeleteKey(address string, keyId string) error
 }
 
 func NewClient(logger *zap.Logger) Client {
@@ -60,4 +61,24 @@ func (c *clientImpl) CreateKey(address string) (*entity.Key, error) {
 		Data:      []byte(key.Data),
 		KeyType:   entity.KeyTypeFromString(key.KeyType),
 	}, nil
+}
+
+func (c *clientImpl) DeleteKey(address string, keyId string) error {
+	req, err := http.NewRequest("DELETE", "http://"+address+"/keys/"+keyId, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add(MASTER_KEY_HEADER, MASTER_KEY)
+
+	resp, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+
 }

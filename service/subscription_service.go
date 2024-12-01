@@ -6,6 +6,7 @@ import (
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
 	"dev/master/service/proxy"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 )
@@ -84,4 +85,16 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 		CountryId:          subscription.CountryId,
 		ExpirationDatetime: timestamppb.New(subscription.ExpirationDateTime),
 	}, nil
+}
+
+func (s *SubscriptionService) DeactivateSubscription(ctx context.Context, request *protogen.DeactivateSubscriptionRequest) (*emptypb.Empty, error) {
+	key, err := s.keyRepository.GetKeyBySubscription(ctx, request.SubscriptionId)
+
+	if err != nil {
+		return nil, nil
+	}
+
+	_ = s.proxyClient.DeleteKey(os.Getenv("DEFAULT_PROXY_ADDRESS"), key.IdInProxy)
+
+	return nil, nil
 }

@@ -19,7 +19,7 @@ type SubscriptionRepository interface {
 func (r *postgresRepository) FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error) {
 	query := `SELECT id, expiration_date, user_id, country_id FROM subscription WHERE user_id = $1`
 
-	if countryId != -1 {
+	if countryId <= 0 {
 		query += fmt.Sprintf(` AND country_id = %d`, countryId)
 	}
 
