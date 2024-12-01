@@ -4,8 +4,6 @@ import (
 	"context"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type UserService struct {
@@ -22,7 +20,7 @@ func NewUserService(repository repository.Repository) *UserService {
 func (s *UserService) RegisterUser(ctx context.Context, userId *protogen.UserId) (*protogen.User, error) {
 	user, err := s.userRepository.CreateUser(ctx, userId.GetId())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, nil
 	}
 
 	return &protogen.User{
@@ -34,7 +32,7 @@ func (s *UserService) RegisterUser(ctx context.Context, userId *protogen.UserId)
 func (s *UserService) GetUserByID(ctx context.Context, userId *protogen.UserId) (*protogen.User, error) {
 	user, err := s.userRepository.FindUserById(ctx, userId.GetId())
 	if err != nil {
-		return nil, status.Error(codes.NotFound, err.Error())
+		return nil, nil
 	}
 
 	return &protogen.User{

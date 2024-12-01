@@ -20,7 +20,7 @@ func NewProxyService(repository repository.Repository) *ProxyService {
 func (s *ProxyService) GetProxies(empty *emptypb.Empty, stream grpc.ServerStreamingServer[protogen.Proxy]) error {
 	proxies, err := s.proxyRepository.GetAllProxies(context.Background())
 	if err != nil {
-		return err
+		return nil
 	}
 
 	for _, proxy := range proxies {

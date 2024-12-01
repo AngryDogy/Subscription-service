@@ -5,8 +5,6 @@ import (
 	"dev/master/entity"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type KeyService struct {
@@ -24,7 +22,7 @@ func (s *KeyService) GetKey(ctx context.Context, keyRequest *protogen.KeyRequest
 	key, err := s.keyRepository.GetKeyBySubscription(ctx, keyRequest.SubscriptionId)
 
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, nil
 	}
 
 	return toProtoKey(*key), nil
@@ -33,7 +31,7 @@ func (s *KeyService) GetKey(ctx context.Context, keyRequest *protogen.KeyRequest
 func (s *KeyService) GetActiveKeysByUser(ctx context.Context, userId *protogen.UserId) (*protogen.CountriesKeys, error) {
 	countriesKeys, err := s.keyRepository.FindActiveUsersKeys(ctx, userId.GetId())
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, nil
 	}
 
 	keys := make(map[string]*protogen.Key, len(countriesKeys))

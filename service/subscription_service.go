@@ -30,7 +30,7 @@ func NewSubscriptionService(repository repository.Repository, proxyClient proxy.
 func (s *SubscriptionService) GetSubscriptions(ctx context.Context, request *protogen.GetSubscriptionsRequest) (*protogen.Subscriptions, error) {
 	subscription, err := s.subscriptionRepository.FindSubscriptions(ctx, request.UserId, request.CountryId, request.Active)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 
 	subscriptions := make([]*protogen.Subscription, 0, len(subscription))
@@ -63,19 +63,19 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 
 	key, err := s.proxyClient.CreateKey(os.Getenv("DEFAULT_PROXY_ADDRESS"))
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 	key.SubscriptionId = subscription.Id
 	key.ProxyId = DEFAULT_PROXY_ID
 
 	_, err = s.keyRepository.InsertKey(ctx, *key)
 	if err != nil {
-		return nil, err
+		return nil, nil
 	}
 
 	return &protogen.Subscription{

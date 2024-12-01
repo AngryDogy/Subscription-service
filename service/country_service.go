@@ -4,8 +4,6 @@ import (
 	"context"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -21,7 +19,7 @@ func NewCountryService(repository repository.Repository) *CountryService {
 func (s *CountryService) GetCountryByName(ctx context.Context, countryName *protogen.CountryName) (*protogen.Country, error) {
 	country, err := s.countryRepository.FindCountryByName(ctx, countryName.Name)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, nil
 	}
 
 	return &protogen.Country{Id: country.Id, Name: country.Name}, nil
@@ -30,7 +28,7 @@ func (s *CountryService) GetCountryByName(ctx context.Context, countryName *prot
 func (s *CountryService) GetAllCountries(ctx context.Context, request *emptypb.Empty) (*protogen.Countries, error) {
 	countries, err := s.countryRepository.GetAllCountries(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, nil
 	}
 
 	var protogenCountries []*protogen.Country
@@ -44,7 +42,7 @@ func (s *CountryService) GetAllCountries(ctx context.Context, request *emptypb.E
 func (s *CountryService) CreateCountry(ctx context.Context, countryName *protogen.CountryName) (*protogen.Country, error) {
 	country, err := s.countryRepository.CreateCountry(ctx, countryName.Name)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, nil
 	}
 
 	return &protogen.Country{Id: country.Id, Name: country.Name}, nil
