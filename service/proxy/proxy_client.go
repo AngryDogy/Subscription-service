@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"fmt"
 	"dev/master/entity"
 	"encoding/json"
 	"io"
