@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"dev/master/entity"
 	"encoding/json"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -65,6 +66,7 @@ func (c *clientImpl) CreateKey(address string) (*entity.Key, error) {
 }
 
 func (c *clientImpl) DeleteKey(address string, keyId string) error {
+
 	req, err := http.NewRequest("DELETE", "http://"+address+"/keys/"+keyId, nil)
 	if err != nil {
 		return err

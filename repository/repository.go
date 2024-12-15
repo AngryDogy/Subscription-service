@@ -43,6 +43,7 @@ type SubscriptionRepository interface {
 	FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error)
 	CreateSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error)
 	CreateTrialSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error)
+	GetAllSubscriptions(ctx context.Context) ([]*entity.Subscription, error)
 }
 
 type ProxyRepository interface {

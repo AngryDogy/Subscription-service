@@ -74,3 +74,14 @@ func (r *postgresRepository) CreateTrialSubscription(ctx context.Context, subscr
 
 	return sub, tx.Commit(ctx)
 }
+
+func (r *postgresRepository) GetAllSubscriptions(ctx context.Context) ([]*entity.Subscription, error) {
+	query := `SELECT id, expiration_date, user_id, country_id, is_trial FROM subscription`
+
+	rows, err := r.conn.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[entity.Subscription])
+}

@@ -24,6 +24,7 @@ const (
 	SubscriptionService_ActivateSubscription_FullMethodName   = "/proto.SubscriptionService/ActivateSubscription"
 	SubscriptionService_HasActiveSubscription_FullMethodName  = "/proto.SubscriptionService/HasActiveSubscription"
 	SubscriptionService_DeactivateSubscription_FullMethodName = "/proto.SubscriptionService/DeactivateSubscription"
+	SubscriptionService_GetAllSubscriptions_FullMethodName    = "/proto.SubscriptionService/GetAllSubscriptions"
 )
 
 // SubscriptionServiceClient is the client API for SubscriptionService service.
@@ -34,6 +35,7 @@ type SubscriptionServiceClient interface {
 	ActivateSubscription(ctx context.Context, in *CreateSubscriptionRequest, opts ...grpc.CallOption) (*Subscription, error)
 	HasActiveSubscription(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*HasActiveSubscriptionResponse, error)
 	DeactivateSubscription(ctx context.Context, in *DeactivateSubscriptionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAllSubscriptions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Subscriptions, error)
 }
 
 type subscriptionServiceClient struct {
@@ -84,6 +86,16 @@ func (c *subscriptionServiceClient) DeactivateSubscription(ctx context.Context, 
 	return out, nil
 }
 
+func (c *subscriptionServiceClient) GetAllSubscriptions(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Subscriptions, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Subscriptions)
+	err := c.cc.Invoke(ctx, SubscriptionService_GetAllSubscriptions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SubscriptionServiceServer is the server API for SubscriptionService service.
 // All implementations must embed UnimplementedSubscriptionServiceServer
 // for forward compatibility.
@@ -92,6 +104,7 @@ type SubscriptionServiceServer interface {
 	ActivateSubscription(context.Context, *CreateSubscriptionRequest) (*Subscription, error)
 	HasActiveSubscription(context.Context, *UserId) (*HasActiveSubscriptionResponse, error)
 	DeactivateSubscription(context.Context, *DeactivateSubscriptionRequest) (*emptypb.Empty, error)
+	GetAllSubscriptions(context.Context, *emptypb.Empty) (*Subscriptions, error)
 	mustEmbedUnimplementedSubscriptionServiceServer()
 }
 
@@ -113,6 +126,9 @@ func (UnimplementedSubscriptionServiceServer) HasActiveSubscription(context.Cont
 }
 func (UnimplementedSubscriptionServiceServer) DeactivateSubscription(context.Context, *DeactivateSubscriptionRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateSubscription not implemented")
+}
+func (UnimplementedSubscriptionServiceServer) GetAllSubscriptions(context.Context, *emptypb.Empty) (*Subscriptions, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllSubscriptions not implemented")
 }
 func (UnimplementedSubscriptionServiceServer) mustEmbedUnimplementedSubscriptionServiceServer() {}
 func (UnimplementedSubscriptionServiceServer) testEmbeddedByValue()                             {}
@@ -207,6 +223,24 @@ func _SubscriptionService_DeactivateSubscription_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SubscriptionService_GetAllSubscriptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SubscriptionServiceServer).GetAllSubscriptions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SubscriptionService_GetAllSubscriptions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SubscriptionServiceServer).GetAllSubscriptions(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SubscriptionService_ServiceDesc is the grpc.ServiceDesc for SubscriptionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +263,10 @@ var SubscriptionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeactivateSubscription",
 			Handler:    _SubscriptionService_DeactivateSubscription_Handler,
+		},
+		{
+			MethodName: "GetAllSubscriptions",
+			Handler:    _SubscriptionService_GetAllSubscriptions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

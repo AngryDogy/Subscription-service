@@ -112,3 +112,22 @@ func (s *SubscriptionService) DeactivateSubscription(ctx context.Context, reques
 
 	return nil, nil
 }
+
+func (s *SubscriptionService) GetAllSubscriptions(ctx context.Context) (*protogen.Subscriptions, error) {
+	allSubscriptions, err := s.subscriptionRepository.GetAllSubscriptions(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	subscriptions := make([]*protogen.Subscription, 0, len(allSubscriptions))
+	for _, sub := range allSubscriptions {
+		subscriptions = append(subscriptions, &protogen.Subscription{
+			Id:                 sub.Id,
+			UserId:             sub.UserId,
+			CountryId:          sub.CountryId,
+			ExpirationDatetime: timestamppb.New(sub.ExpirationDateTime),
+			Trial:              sub.IsTrial,
+		})
+	}
+	return &protogen.Subscriptions{Subscriptions: subscriptions}, nil
+}
