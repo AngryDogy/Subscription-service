@@ -12,8 +12,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const DEFAULT_PROXY_ID = int64(1)
-
 type SubscriptionService struct {
 	subscriptionRepository repository.SubscriptionRepository
 	keyRepository          repository.KeyRepository
@@ -83,7 +81,7 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 		return nil, nil
 	}
 	key.SubscriptionId = subscription.Id
-	key.ProxyId = DEFAULT_PROXY_ID
+	key.ProxyId = proxy.Id
 
 	_, err = s.keyRepository.InsertKey(ctx, *key)
 	if err != nil {
@@ -95,6 +93,7 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 		UserId:             subscription.UserId,
 		CountryId:          subscription.CountryId,
 		ExpirationDatetime: timestamppb.New(subscription.ExpirationDateTime),
+		Trial:              subscription.IsTrial,
 	}, nil
 }
 
