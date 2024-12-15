@@ -113,8 +113,8 @@ func (s *SubscriptionService) DeactivateSubscription(ctx context.Context, reques
 	return nil, nil
 }
 
-func (s *SubscriptionService) GetAllSubscriptions(ctx context.Context) (*protogen.Subscriptions, error) {
-	allSubscriptions, err := s.subscriptionRepository.GetAllSubscriptions(ctx)
+func (s *SubscriptionService) GetAllSubscriptions(context.Context, *emptypb.Empty) (*protogen.Subscriptions, error) {
+	allSubscriptions, err := s.subscriptionRepository.GetAllSubscriptions(context.Background())
 	if err != nil {
 		return nil, err
 	}
