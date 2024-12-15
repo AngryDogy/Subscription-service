@@ -80,6 +80,8 @@ func uploadCountries(repository repository.Repository, logger *zap.Logger) error
 		_, err = repository.CreateCountry(context.Background(), country)
 		if err != nil {
 			logger.Warn("Error occured while creating countries", zap.Error(err))
+		} else {
+			logger.Info("Country was successfully uploaded", zap.String("country name", country.Name))
 		}
 	}
 
@@ -103,6 +105,8 @@ func uploadProxies(repository repository.Repository, logger *zap.Logger) error {
 		_, err := repository.CreateProxy(context.Background(), proxy)
 		if err != nil {
 			logger.Warn("Error occured while creating proxies", zap.Error(err))
+		} else {
+			logger.Info("Proxe was successfully uploaded", zap.String("address", proxy.Address))
 		}
 	}
 
