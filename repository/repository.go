@@ -47,6 +47,7 @@ type SubscriptionRepository interface {
 
 type ProxyRepository interface {
 	GetAllProxies(ctx context.Context) ([]*entity.Proxy, error)
+	GetProxyById(ctx context.Context, id int64) (*entity.Proxy, error)
 	CreateProxy(ctx context.Context, proxy entity.Proxy) (*entity.Proxy, error)
 	GetRandomProxyByCountry(ctx context.Context, country_id int64) (*entity.Proxy, error)
 }

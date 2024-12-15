@@ -6,7 +6,6 @@ import (
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
 	"dev/master/service/proxy"
-	"os"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -32,7 +31,7 @@ func NewSubscriptionService(repository repository.Repository, proxyClient proxy.
 func (s *SubscriptionService) GetSubscriptions(ctx context.Context, request *protogen.GetSubscriptionsRequest) (*protogen.Subscriptions, error) {
 	subscription, err := s.subscriptionRepository.FindSubscriptions(ctx, request.UserId, request.CountryId, request.Active)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	subscriptions := make([]*protogen.Subscription, 0, len(subscription))
@@ -68,24 +67,24 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 	}
 
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	proxy, err := s.proxyRepository.GetRandomProxyByCountry(ctx, request.CountryId)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	key, err := s.proxyClient.CreateKey(proxy.Address)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	key.SubscriptionId = subscription.Id
 	key.ProxyId = proxy.Id
 
 	_, err = s.keyRepository.InsertKey(ctx, *key)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return &protogen.Subscription{
@@ -101,10 +100,15 @@ func (s *SubscriptionService) DeactivateSubscription(ctx context.Context, reques
 	key, err := s.keyRepository.GetKeyBySubscription(ctx, request.SubscriptionId)
 
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
-	_ = s.proxyClient.DeleteKey(os.Getenv("DEFAULT_PROXY_ADDRESS"), key.IdInProxy)
+	proxy, err := s.proxyRepository.GetProxyById(ctx, key.ProxyId)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = s.proxyClient.DeleteKey(proxy.Address, key.IdInProxy)
 
 	return nil, nil
 }

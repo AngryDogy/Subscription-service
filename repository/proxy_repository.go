@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"context"
 	"dev/master/entity"
 
@@ -18,6 +19,18 @@ func (r *postgresRepository) GetAllProxies(ctx context.Context) ([]*entity.Proxy
 	}
 
 	return pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[entity.Proxy])
+}
+
+func (r *postgresRepository) GetProxyById(ctx context.Context, id int64) (*entity.Proxy, error) {
+	query := `SELECT id, address, country_id FROM proxy WHERE id=$1`
+
+	var proxy entity.Proxy
+	err := r.conn.QueryRow(ctx, query, fmt.Sprintf("%d", id)).Scan(&proxy.Id, &proxy.Address, &proxy.CountryId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proxy, nil
 }
 
 func (r *postgresRepository) CreateProxy(ctx context.Context, proxy entity.Proxy) (*entity.Proxy, error) {

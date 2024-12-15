@@ -24,7 +24,7 @@ func (s *UserService) RegisterUser(ctx context.Context, userCreateRequest *proto
 		Username: userCreateRequest.Username,
 	})
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return &protogen.User{
@@ -37,7 +37,7 @@ func (s *UserService) RegisterUser(ctx context.Context, userCreateRequest *proto
 func (s *UserService) GetUserByID(ctx context.Context, userId *protogen.UserId) (*protogen.User, error) {
 	user, err := s.userRepository.FindUserById(ctx, userId.GetId())
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return &protogen.User{

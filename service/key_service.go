@@ -22,7 +22,7 @@ func (s *KeyService) GetKey(ctx context.Context, keyRequest *protogen.KeyRequest
 	key, err := s.keyRepository.GetKeyBySubscription(ctx, keyRequest.SubscriptionId)
 
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	return toProtoKey(*key), nil
@@ -31,7 +31,7 @@ func (s *KeyService) GetKey(ctx context.Context, keyRequest *protogen.KeyRequest
 func (s *KeyService) GetActiveKeysByUser(ctx context.Context, userId *protogen.UserId) (*protogen.CountriesKeys, error) {
 	countriesKeys, err := s.keyRepository.FindActiveUsersKeys(ctx, userId.GetId())
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	keys := make(map[string]*protogen.Key, len(countriesKeys))
