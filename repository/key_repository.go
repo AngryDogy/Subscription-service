@@ -43,13 +43,13 @@ func (r *postgresRepository) FindActiveUsersKeys(ctx context.Context, userId int
 }
 
 func (r *postgresRepository) GetKeyBySubscription(ctx context.Context, subscriptionId int64) (*entity.Key, error) {
-	query := `select k.id, k.key_type, k.proxy_id, k.data
+	query := `select k.id, k.key_type, k.proxy_id, k.data, k.id_in_proxy
 				from key k
 				where k.subscription_id = $1`
 
 	var key entity.Key
 	var keyType string
-	err := r.conn.QueryRow(ctx, query, subscriptionId).Scan(&key.Id, &keyType, &key.ProxyId, &key.Data)
+	err := r.conn.QueryRow(ctx, query, subscriptionId).Scan(&key.Id, &keyType, &key.ProxyId, &key.Data, &key.IdInProxy)
 	if err != nil {
 		return nil, err
 	}

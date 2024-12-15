@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"dev/master/entity"
 	"encoding/json"
 	"go.uber.org/zap"
@@ -70,7 +71,7 @@ func (c *clientImpl) DeleteKey(address string, keyId string) error {
 	}
 
 	req.Header.Add(MASTER_KEY_HEADER, MASTER_KEY)
-
+	
 	resp, err := http.DefaultClient.Do(req)
 
 	if err != nil {
