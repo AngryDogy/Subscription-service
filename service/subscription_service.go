@@ -6,9 +6,10 @@ import (
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
 	"dev/master/service/proxy"
+	"os"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"os"
 )
 
 const DEFAULT_PROXY_ID = int64(1)
@@ -16,6 +17,7 @@ const DEFAULT_PROXY_ID = int64(1)
 type SubscriptionService struct {
 	subscriptionRepository repository.SubscriptionRepository
 	keyRepository          repository.KeyRepository
+	proxyRepository        repository.ProxyRepository
 	proxyClient            proxy.Client
 	protogen.UnimplementedSubscriptionServiceServer
 }
@@ -24,6 +26,7 @@ func NewSubscriptionService(repository repository.Repository, proxyClient proxy.
 	return &SubscriptionService{
 		subscriptionRepository: repository,
 		keyRepository:          repository,
+		proxyRepository:        repository,
 		proxyClient:            proxyClient,
 	}
 }
@@ -41,6 +44,7 @@ func (s *SubscriptionService) GetSubscriptions(ctx context.Context, request *pro
 			UserId:             sub.UserId,
 			CountryId:          sub.CountryId,
 			ExpirationDatetime: timestamppb.New(sub.ExpirationDateTime),
+			Trial:              sub.IsTrial,
 		})
 	}
 	return &protogen.Subscriptions{Subscriptions: subscriptions}, nil
@@ -54,12 +58,14 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 			UserId:             request.UserId,
 			CountryId:          request.CountryId,
 			ExpirationDateTime: request.ExpirationDatetime.AsTime(),
+			IsTrial:            true,
 		})
 	} else {
 		subscription, err = s.subscriptionRepository.CreateSubscription(ctx, entity.Subscription{
 			UserId:             request.UserId,
 			CountryId:          request.CountryId,
 			ExpirationDateTime: request.ExpirationDatetime.AsTime(),
+			IsTrial:            false,
 		})
 	}
 
@@ -67,7 +73,12 @@ func (s *SubscriptionService) ActivateSubscription(ctx context.Context, request 
 		return nil, nil
 	}
 
-	key, err := s.proxyClient.CreateKey(os.Getenv("DEFAULT_PROXY_ADDRESS"))
+	proxy, err := s.proxyRepository.GetRandomProxyByCountry(ctx, request.CountryId)
+	if err != nil {
+		return nil, nil
+	}
+
+	key, err := s.proxyClient.CreateKey(proxy.Address)
 	if err != nil {
 		return nil, nil
 	}

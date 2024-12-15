@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type Server struct {
@@ -20,6 +21,7 @@ func NewServer(logger *zap.Logger, opt []grpc.ServerOption) *Server {
 
 	opt = append(opt, grpc.UnaryInterceptor(server.logInterception))
 	server.grpcServer = grpc.NewServer(opt...)
+	reflection.Register(server.grpcServer)
 
 	return server
 }

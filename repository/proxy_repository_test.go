@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"dev/master/entity"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_postgresRepository_GetAllProxies(t *testing.T) {

@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"dev/master/entity"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
+
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -39,8 +41,11 @@ func (s *CountryService) GetAllCountries(ctx context.Context, request *emptypb.E
 	return &protogen.Countries{Countries: protogenCountries}, nil
 }
 
-func (s *CountryService) CreateCountry(ctx context.Context, countryName *protogen.CountryName) (*protogen.Country, error) {
-	country, err := s.countryRepository.CreateCountry(ctx, countryName.Name)
+func (s *CountryService) CreateCountry(ctx context.Context, countryCreateRequest *protogen.CountryCreateRequest) (*protogen.Country, error) {
+	country, err := s.countryRepository.CreateCountry(ctx, entity.Country{
+		Id:   countryCreateRequest.Id,
+		Name: countryCreateRequest.Name,
+	})
 	if err != nil {
 		return nil, nil
 	}

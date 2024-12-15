@@ -5,28 +5,22 @@ import (
 	"dev/master/entity"
 )
 
-type UserRepository interface {
-	CreateUser(ctx context.Context, userId int64) (*entity.User, error)
-	FindUserById(ctx context.Context, userId int64) (*entity.User, error)
-	UpdateUser(ctx context.Context, user *entity.User) (*entity.User, error)
-}
+func (r *postgresRepository) CreateUser(ctx context.Context, user *entity.User) (*entity.User, error) {
+	query := `INSERT INTO "user"(id, username, had_trial) VALUES($1, $2, $3) RETURNING id, username, had_trial`
 
-func (r *postgresRepository) CreateUser(ctx context.Context, userId int64) (*entity.User, error) {
-	query := `INSERT INTO "user"(id, had_trial) VALUES($1, $2) RETURNING id, had_trial`
-
-	var user entity.User
-	err := r.conn.QueryRow(ctx, query, userId, false).Scan(&user.Id, &user.HadTrial)
+	var createdUser entity.User
+	err := r.conn.QueryRow(ctx, query, user.Id, user.Username, false).Scan(&createdUser.Id, &createdUser.Username, &createdUser.HadTrial)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return &createdUser, nil
 }
 
 func (r *postgresRepository) FindUserById(ctx context.Context, userId int64) (*entity.User, error) {
-	query := `SELECT id, had_trial FROM "user" WHERE id = $1`
+	query := `SELECT id, username, had_trial FROM "user" WHERE id = $1`
 	var user entity.User
-	err := r.conn.QueryRow(ctx, query, userId).Scan(&user.Id, &user.HadTrial)
+	err := r.conn.QueryRow(ctx, query, userId).Scan(&user.Id, &user.Username, &user.HadTrial)
 	if err != nil {
 		return nil, err
 	}

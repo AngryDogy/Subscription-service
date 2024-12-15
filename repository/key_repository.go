@@ -8,12 +8,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type KeyRepository interface {
-	FindActiveUsersKeys(ctx context.Context, userId int64) (map[string]*entity.Key, error)
-	GetKeyBySubscription(ctx context.Context, subscriptionId int64) (*entity.Key, error)
-	InsertKey(ctx context.Context, key entity.Key) (*entity.Key, error)
-}
-
 func (r *postgresRepository) FindActiveUsersKeys(ctx context.Context, userId int64) (map[string]*entity.Key, error) {
 	query := `select c.name, k.id, k.key_type, s.id, k.proxy_id, k.data
 				from key k join subscription s 

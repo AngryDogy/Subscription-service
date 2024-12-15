@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"dev/master/entity"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_postgresRepository_GetAllCountries(t *testing.T) {
@@ -44,7 +45,10 @@ func Test_postgresRepository_CreateCountry(t *testing.T) {
 	require.Nil(t, err)
 	defer repository.Close()
 
-	country, err := repository.CreateCountry(context.TODO(), "Netherlands")
+	country, err := repository.CreateCountry(context.TODO(), entity.Country{
+		Id:   2,
+		Name: "Netherlands",
+	})
 
 	require.Nil(t, err)
 

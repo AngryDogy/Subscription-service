@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -75,8 +75,9 @@ func TestRegisterUserAndActivateSubscription(t *testing.T) {
 	defer stop()
 
 	repository.EXPECT().CreateUser(gomock.Any(), int64(1266306390)).Return(&entity.User{}, nil)
-	client.userClient.RegisterUser(context.Background(), &protogen.UserId{
-		Id: 1266306390,
+	client.userClient.RegisterUser(context.Background(), &protogen.UserCreateRequest{
+		Id:       1266306390,
+		Username: "cool user",
 	})
 
 	expirationDate := time.Now().Add(time.Hour * 168).UTC()

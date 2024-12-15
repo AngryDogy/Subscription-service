@@ -10,16 +10,10 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type SubscriptionRepository interface {
-	FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error)
-	CreateSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error)
-	CreateTrialSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error)
-}
-
 func (r *postgresRepository) FindSubscriptions(ctx context.Context, userId int64, countryId int64, active bool) ([]*entity.Subscription, error) {
-	query := `SELECT id, expiration_date, user_id, country_id FROM subscription WHERE user_id = $1`
+	query := `SELECT id, expiration_date, user_id, country_id, is_trial FROM subscription WHERE user_id = $1`
 
-	if countryId <= 0 {
+	if countryId >= 0 {
 		query += fmt.Sprintf(` AND country_id = %d`, countryId)
 	}
 
@@ -37,11 +31,11 @@ func (r *postgresRepository) FindSubscriptions(ctx context.Context, userId int64
 }
 
 func (r *postgresRepository) CreateSubscription(ctx context.Context, subscription entity.Subscription) (*entity.Subscription, error) {
-	query := `INSERT INTO subscription (user_id, country_id, expiration_date) VALUES ($1, $2, $3) RETURNING id, user_id, country_id, expiration_date`
+	query := `INSERT INTO subscription (user_id, country_id, expiration_date, is_trial) VALUES ($1, $2, $3, $4) RETURNING id, user_id, country_id, expiration_date, is_trial`
 
 	err := r.conn.
-		QueryRow(ctx, query, subscription.UserId, subscription.CountryId, subscription.ExpirationDateTime.Truncate(time.Second)).
-		Scan(&subscription.Id, &subscription.UserId, &subscription.CountryId, &subscription.ExpirationDateTime)
+		QueryRow(ctx, query, subscription.UserId, subscription.CountryId, subscription.ExpirationDateTime.Truncate(time.Second), subscription.IsTrial).
+		Scan(&subscription.Id, &subscription.UserId, &subscription.CountryId, &subscription.ExpirationDateTime, &subscription.IsTrial)
 
 	if err != nil {
 		return nil, err

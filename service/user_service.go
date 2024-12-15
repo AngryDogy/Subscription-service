@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"dev/master/entity"
 	protogen "dev/master/protogen/proto/api/v1"
 	"dev/master/repository"
 )
@@ -17,14 +18,18 @@ func NewUserService(repository repository.Repository) *UserService {
 	}
 }
 
-func (s *UserService) RegisterUser(ctx context.Context, userId *protogen.UserId) (*protogen.User, error) {
-	user, err := s.userRepository.CreateUser(ctx, userId.GetId())
+func (s *UserService) RegisterUser(ctx context.Context, userCreateRequest *protogen.UserCreateRequest) (*protogen.User, error) {
+	user, err := s.userRepository.CreateUser(ctx, &entity.User{
+		Id:       userCreateRequest.Id,
+		Username: userCreateRequest.Username,
+	})
 	if err != nil {
 		return nil, nil
 	}
 
 	return &protogen.User{
 		Id:       user.Id,
+		Username: user.Username,
 		HadTrial: user.HadTrial,
 	}, nil
 }
@@ -37,6 +42,7 @@ func (s *UserService) GetUserByID(ctx context.Context, userId *protogen.UserId) 
 
 	return &protogen.User{
 		Id:       user.Id,
+		Username: user.Username,
 		HadTrial: user.HadTrial,
 	}, nil
 }

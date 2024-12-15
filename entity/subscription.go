@@ -9,4 +9,5 @@ type Subscription struct {
 	UserId             int64     `db:"user_id"`
 	CountryId          int64     `db:"country_id"`
 	ExpirationDateTime time.Time `db:"expiration_date"`
+	IsTrial            bool      `db:"is_trial"`
 }
