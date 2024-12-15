@@ -1,11 +1,9 @@
 package repository
 
 import (
-	"fmt"
 	"context"
 	"dev/master/entity"
-
-	"math/rand"
+	"fmt"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -58,5 +56,5 @@ func (r *postgresRepository) GetRandomProxyByCountry(ctx context.Context, countr
 		return nil, err
 	}
 
-	return proxies[rand.Intn(len(proxies))], nil
+	return proxies[0], nil
 }
